@@ -1,10 +1,12 @@
 package com.kerem.userboot.service;
 
+import com.kerem.userboot.logout.BlackList;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,9 @@ import java.util.function.Function;
 
 @Component /*jwt için ilk aşama*/
 public class JwtService {
+
+    @Autowired
+    private BlackList blackList;
 
     private static final String SECERET = "!@#$FSADAWFDAOIPJFAWDAFQWJIKUJYNNVCASADAEQWRCAASDAWQ";
 
@@ -63,6 +68,6 @@ public class JwtService {
     }
     public Boolean validateToken(String token, UserDetails userDetails){
         final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token) && !blackList.isBlackListed(token)); /*çıkış işlemi için üçüncü*/
     }
 }
